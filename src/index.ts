@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { IParser } from "./interfaces";
 import { TnsEntry } from "./types";
 
@@ -6,14 +7,20 @@ const re = new RegExp(/^([\w.-]+)\s*=\s*((?:.\s?+|\([^)]*\)\s)*(?=(?:\w+\s*=|$))
 
 export class TnsParser implements IParser {
 
-    private filePath: string;
+    private entries: TnsEntry[];
 
     constructor(filePath: string) {
-        this.filePath = filePath;
+        const content = this.readConfigFile(filePath);
+
+        this.entries = this.parseConfigFile(content);
     }
 
     readConfigFile(path: string): string | never {
-        throw new Error("Method not implemented.");
+        try {
+            return fs.readFileSync(path, 'utf-8');
+        } catch (error) {
+            throw new Error(`Error reading file: ${error}`);
+        }
     }
 
     parseConfigFile(data: string): TnsEntry[] {
