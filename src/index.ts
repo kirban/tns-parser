@@ -1,13 +1,15 @@
-import * as fs from 'fs';
+import * as fs from "fs";
 import { IParser } from "./interfaces";
 import { TnsEntry } from "./types";
 
 export class TnsParser implements IParser {
 
+    private filePath: string;
     private entries: TnsEntry[];
 
     constructor(filePath: string, createConfigIfNotExists=false) {
         const content = this.readConfigFile(filePath, createConfigIfNotExists);
+        this.filePath = filePath;
 
         this.entries = this.parseConfigFile(content);
     }
@@ -42,7 +44,6 @@ export class TnsParser implements IParser {
         const matches = Array.from(data.matchAll(re));
 
         return matches.map((match) => {
-            console.log()
             return {
                 alias: match[1],
                 connectionString: match[2].trim().replaceAll(spacesRe, ''),
@@ -55,8 +56,21 @@ export class TnsParser implements IParser {
         return this.entries.find((entry) => entry.alias.toLowerCase() === lowercasedSearch)?.connectionString || null;
     }
 
-    public setTnsEntry(aliasName: string, connectionData: string): void | never {
-        throw new Error("Method not implemented.");
+    public setTnsEntry(newEntry: TnsEntry): void | never {
+        const entryExists = this.entries.some((entry) => entry.alias === newEntry.alias);
+
+        if (entryExists) {
+            throw new Error('Entry with this alias already exists! Try to pick another one.');
+        }
+
+        try {
+            fs.writeFileSync(this.filePath, `\n${newEntry.alias} = ${newEntry.connectionString}`,{ flag: 'a' });
+        } catch (error) {
+            throw new Error('Failed appending config file!');
+        }
+
+        this.entries.push(newEntry);
+
     }
 
 }
