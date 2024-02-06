@@ -6,23 +6,33 @@ export class TnsParser implements IParser {
 
     private entries: TnsEntry[];
 
-    constructor(filePath: string) {
-        const content = this.readConfigFile(filePath);
+    constructor(filePath: string, createConfigIfNotExists=false) {
+        const content = this.readConfigFile(filePath, createConfigIfNotExists);
 
         this.entries = this.parseConfigFile(content);
     }
 
-    private readConfigFile(path: string): string | never {
+    private readConfigFile(path: string, createFile?: boolean): string | never {
+        if (createFile && !fs.existsSync(path)) {
+            this.createConfigFile(path);
+        }
+
         try {
             return fs.readFileSync(path, 'utf-8');
         } catch (error) {
-            throw new Error(`Error reading file: ${error}`);
+            throw new Error(`Error reading file:\n${error}`);
         }
     }
 
     private createConfigFile(path: string): void | never {
         // when special option is set - create config file if not exists
-        throw new Error("Method not implemented.");
+        console.debug(`Failed to find config at path ${path}\nTrying to create ...`);
+
+        try {
+            fs.writeFileSync(path, '', { flag: 'w+' });
+        } catch (error) {
+            throw new Error(`Failed to create new config file:\n${error}`);
+        }
     }
 
     private parseConfigFile(data: string): TnsEntry[] {
