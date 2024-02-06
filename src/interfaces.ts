@@ -1,6 +1,6 @@
 import { TnsEntry } from "./types";
 
 export interface IParser {
-    getTnsEntry(entries: TnsEntry[], searchKey: string): string | never;
-    setTnsEntry(entries: TnsEntry[], aliasName: string, connectionData: string): string | never;
+    getTnsEntry(searchKey: string): string | never;
+    setTnsEntry(aliasName: string, connectionData: string): void | never;
 }
