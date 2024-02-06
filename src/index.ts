@@ -50,8 +50,9 @@ export class TnsParser implements IParser {
         })
     }
 
-    public getTnsEntry(searchKey: string): string | never {
-        throw new Error("Method not implemented.");
+    public getTnsEntry(searchKey: string): string | null {
+        const lowercasedSearch = searchKey.toLowerCase();
+        return this.entries.find((entry) => entry.alias.toLowerCase() === lowercasedSearch)?.connectionString || null;
     }
 
     public setTnsEntry(aliasName: string, connectionData: string): void | never {
