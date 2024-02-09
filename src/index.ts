@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import type { IParser } from './interfaces'
 import type { TnsEntry } from './types'
+import { TNS_ENTRY_REGEX, SPACES_REGEX } from './constants'
 
 export class TnsParser implements IParser {
   private readonly filePath: string
@@ -44,14 +45,12 @@ export class TnsParser implements IParser {
 
   private parseConfigFile (data: string): TnsEntry[] {
     // Regular expression to search connection names and connection strings
-    const re = /^([\w.-]+)\s*=\s*((?:.\s?|\([^)]*\)\s)*(?=(?:\w+\s*=|$)))/gmi
-    const spacesRe = /\s/gm
-    const matches = Array.from(data.matchAll(re))
+    const matches = Array.from(data.matchAll(TNS_ENTRY_REGEX))
 
     return matches.map((match) => {
       return {
         alias: match[1],
-        connectionString: match[2].trim().replaceAll(spacesRe, '')
+        connectionString: match[2].trim().replaceAll(SPACES_REGEX, '')
       }
     })
   }
