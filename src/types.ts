@@ -1,4 +1,4 @@
-export type TnsEntry = {
-    alias: string;
-    connectionString: string;
+export interface TnsEntry {
+  alias: string
+  connectionString: string
 }
